@@ -13,13 +13,18 @@ pub fn main() !u8 {
     const mc_path = args[1];
     const test_dir_path = args[2];
 
+    // runTest will be using a different working directory for each test, so
+    // it is easiest to use an absolute path for MC.
+    const mc_path_abs = try std.fs.cwd().realpathAlloc(gpa, mc_path);
+    defer gpa.free(mc_path_abs);
+
     var results: Results = .init;
     var test_dir = try std.fs.cwd().openDir(test_dir_path, .{ .iterate = true });
     defer test_dir.close();
     var test_dir_iterator = test_dir.iterate();
     while (try test_dir_iterator.next()) |test_dir_entry| {
         if (std.mem.endsWith(u8, test_dir_entry.name, ".MML")) {
-            try runTest(gpa, test_dir_entry.name, test_dir, mc_path, &results);
+            try runTest(gpa, test_dir_entry.name, test_dir, mc_path_abs, &results);
         }
     }
     log.info("pass: {}, fail: {}", .{ results.n_pass, results.n_fail });
