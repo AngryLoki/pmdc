@@ -6,10 +6,10 @@
 #include <string.h>
 
 // :13
-#if !hyouka
+#ifndef hyouka
 #define hyouka 0
 #endif
-#if !efc
+#ifndef efc
 #define efc 0
 #endif
 
