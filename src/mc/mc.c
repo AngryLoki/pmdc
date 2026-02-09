@@ -2303,7 +2303,7 @@ static void ppsfile_set(struct mc *mc, char *macro_start) {
         pcmextend_set(mc, macro_start);
         return;
     case 'S':
-        ppsfile_set(mc, macro_start);
+        mc->ppsfile_adr = mc->si;
         return;
     default:
         ps_error(mc);
@@ -3291,7 +3291,7 @@ static void fb_set(struct mc *mc) {
     if (*mc->si == '+' || *mc->si == '-') {
         // :3844
         uint8_t val = getnum(mc);
-        if (val + 7 >= 15) error(mc, 'F', 2);
+        if ((uint8_t)(val + 7) >= 15) error(mc, 'F', 2);
         *mc->di++ = 0x80 | val;
     } else {
         // :3837
@@ -3727,16 +3727,16 @@ static void ssgeg_set(struct mc *mc) {
     ssgeg_reg += 0x90;
 
     // :4366
-    if ((slot & 1) == 0) sss_set1slot(mc, ssgeg_reg, num);
+    if ((slot & 1) != 0) sss_set1slot(mc, ssgeg_reg, num);
     // :4369
     ssgeg_reg += 8;
-    if ((slot & 2) == 0) sss_set1slot(mc, ssgeg_reg, num);
+    if ((slot & 2) != 0) sss_set1slot(mc, ssgeg_reg, num);
     // :4374
     ssgeg_reg -= 4;
-    if ((slot & 4) == 0) sss_set1slot(mc, ssgeg_reg, num);
+    if ((slot & 4) != 0) sss_set1slot(mc, ssgeg_reg, num);
     // :4379
     ssgeg_reg += 8;
-    if ((slot & 8) == 0) sss_set1slot(mc, ssgeg_reg, num);
+    if ((slot & 8) != 0) sss_set1slot(mc, ssgeg_reg, num);
 
     // :4384
     olc0(mc);
@@ -5280,7 +5280,9 @@ static void sular(struct mc *mc) {
         return;
     }
     // :6273
-    ots002(mc, mc->di[-3]);
+    uint8_t onkai = mc->di[-3];
+    ots002(mc, onkai);
+    bp8(mc, onkai);
 }
 
 // :6279
