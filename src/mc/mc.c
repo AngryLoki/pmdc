@@ -5024,14 +5024,15 @@ static void vsetm1(struct mc *mc, uint8_t vol) {
 
 // :6007
 static void vss(struct mc *mc) {
-    mc->volss = getnum(mc);
+    uint8_t volss_raw = (uint8_t)getnum(mc);
+    mc->volss = (int8_t)volss_raw;
 #if !efc
     if (mc->part == pcmpart || mc->ongen == pcm_ex) {
-        vsetm1(mc, mc->nowvol);
+        vsetm1(mc, volss_raw);
         return;
     }
     if (mc->towns_flg == 1 && mc->part == rhythm2) {
-        vsetm1(mc, mc->nowvol);
+        vsetm1(mc, volss_raw);
         return;
     }
 #endif
