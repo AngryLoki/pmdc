@@ -5883,8 +5883,12 @@ static void lfoswitch(struct mc *mc, char cmd) {
     }
     // :7030
     if (lngset(mc, &n) != 0) error(mc, '*', 6);
-    // BUG: should be decrementing di
-    if (lfocmd == mc->di[-2]) mc->si -= 2;
+    // BUG in original ASM: "cmp bh,-2[di]" lacks ES: segment override,
+    // so it reads from DS:DI-2 (MML input area) instead of ES:DI-2
+    // (output buffer). The comparison almost never matches, making
+    // "sub si,2" effectively dead code.
+    // Covered by LFOSWITCH.MML *A1,A2 testcase.
+    // if (lfocmd == mc->di[-2]) mc->si -= 2;
     *mc->di++ = lfocmd;
     *mc->di++ = n;
     olc0(mc);
